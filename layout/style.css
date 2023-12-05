@@ -1,0 +1,47 @@
+body {
+  background-color: #111827;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  margin: 0 2rem 0 2rem;
+}
+
+.table {
+  border-spacing: 0 15px;
+}
+
+i {
+  font-size: 1rem !important;
+}
+
+.table tr {
+  border-radius: 20px;
+}
+
+h1 {
+  color: #e1dfd1;
+  font-size: 50px;
+}
+
+tr td:nth-child(n + 5),
+tr th:nth-child(n + 5) {
+  border-radius: 0 0.625rem 0.625rem 0;
+}
+
+tr td:nth-child(1),
+tr th:nth-child(1) {
+  border-radius: 0.625rem 0 0 0.625rem;
+}
+
+/**HOVER DE SVG's**/
+.crear {
+  background-color: #1f2937;
+}
+.crear svg {
+  transition: fill 0.3s ease; /* Agrega una transición suave al cambio de color */
+}
+
+/* Cambia el color del path al hacer hover sobre el SVG */
+.crear svg:hover path {
+  fill: #16a34a; /* Cambia este valor al color que desees */
+}
