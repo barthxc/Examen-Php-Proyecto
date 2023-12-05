@@ -8,6 +8,9 @@ Si el usuario no ha iniciado sesión solo podrá acceder al inicio de la web don
 
 La persistencia del usuario se hará usando sesiones.
 
+El proyecto se utilizará para poder crear una interfaz agradable tailwind usando una importación con un CDN.
+Así me comprometo a que la interfaz visual sea clara y de calidad sin perder tiempo en el proyecto.
+
 
 Se irá actualizando el readme con todas novedades del proyecto.
 
