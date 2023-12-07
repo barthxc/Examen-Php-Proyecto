@@ -20,8 +20,15 @@ Tenemos mensajes referenciados por la validación en la propia página. También
 - Se ha creado el registro de usuarios y el login de forma correcta, creando así también la persistencia de datos con la sesiones para acceder a vault.php y también 
 mostrando el nombre de la persiona que ha iniciado sesión sustituyendo "invitado" y la función de "login" por "logout"
 
+- Se ha creado una función que muestra todas las peliculas que espera el parámetro de la sesión para mostrar los elementos audiovisuales exclusivo del usuario.
+
+- Se ha implementado correctamente la función de agregar pelicula y su eliminación
+
+- Se ha implementado el modal absoluto que muestra el formulario para modificar la pelicula y los datos correspondientes de cada una
+
+
+- Falta implementar los filtros relacionados con los elementos audiovisuales y los nombres de los usuarios fidelizados
         - Mas tarde se debe crear el formulario de registro de los datos del vault, las peliculas/series. Crear también filtros si es posible de los datos como:
-                - Mostrar solo peliculas
                 - Mostrar solo series
                 - Mostrar solo vistas
                 - Mostrar solo siguiendo
