@@ -11,6 +11,9 @@ $password = '';
 
 //Variables para controlar
 $modal = false;
+$modalaudiovisual=false;
+$modalaudiovisualmodificar=false;
+
 
 //Conexión a la base de datos
 try {
@@ -23,15 +26,36 @@ try {
 }
 
 
-//AbrirModal
+//AbrirModal LOGIN
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['openloginmodal'])) {
     $modal = true;
 }
 
-//CerrarModal
+//CerrarModal LOGIN
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['closeloginmodal'])) {
     $modal = false;
 }
+
+//AbrirModal Audiovisual
+if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['openmodalaudiovisual'])) {
+    $modalaudiovisual = true;
+}
+//CerrarModal Audiovisual
+if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['closemodalaudiovisual'])) {
+    header('Location: ../pages/vault.php?audiovisualvacio=false');
+    exit;
+}
+
+//AbrirModalModificar Audiovisual
+if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['openmodalmodificar'])) {
+    $idAudiovisual= $_POST['idAudiovisual'];
+    $tipo= $_POST['tipo'];
+    $nombre= $_POST['nombre'];
+    $descripcion= $_POST['descripcion'];
+    $estado= $_POST['estado'];
+    $modalaudiovisualmodificar = true;
+}
+
 
 
 
@@ -101,6 +125,7 @@ function loginUsuario($conexion, $email, $password)
                 // Usuario autenticado, establecer la sesión
                 session_start();
                 $_SESSION['usuario'] = $usuario['nombre'];
+                $_SESSION['id'] = $usuario['id'];
 
                 header('Location: ../pages/index.php?success=true');
                 exit;
@@ -127,4 +152,125 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['logout'])) {
     header('Location: ../pages/index.php');
     exit;  
 }
+
+
+
+//Registro Audiovisual
+if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['agregaraudiovisual'])) {
+
+    $tipo = $_POST['tipo'];
+    $nombre = mb_strtoupper(trim($_POST['nombre']));
+    $descripcion = trim($_POST['descripcion']);
+    $estado = $_POST['estado'];
+
+    agregarAudiovisual($conexion, $tipo,$nombre,$descripcion,$estado);
+}
+
+function agregarAudiovisual($conexion, $tipo,$nombre,$descripcion,$estado){
+    if (empty($tipo) || empty($nombre) || empty($descripcion) || empty($estado)) {
+        header("Location: vault.php?audiovisualvacio=true");
+        exit;
+    }
+
+    if (!in_array($tipo, ['pelicula', 'serie']) || !in_array($estado, ['vista', 'viendo', 'pendiente'])) {
+        header("Location: vault.php?audiovisualvacio=false");
+        exit;
+    }else{
+        try {
+            $query = "INSERT INTO audiovisual (idUsuario, tipo, nombre, descripcion,estado) VALUES (:idUsuario, :tipo , :nombre , :descripcion, :estado)";
+            $statement = $conexion->prepare($query);
+            $statement->bindParam(':idUsuario', $_SESSION['id'], PDO::PARAM_INT);
+            $statement->bindParam(':tipo', $tipo, PDO::PARAM_STR);
+            $statement->bindParam(':nombre', $nombre, PDO::PARAM_STR);
+            $statement->bindParam(':descripcion', $descripcion, PDO::PARAM_STR);
+            $statement->bindParam(':estado', $estado, PDO::PARAM_STR);
+            $statement->execute();
+            header('Location ../pages/vault.php');
+        } catch (PDOException $e) {
+            header('Location: ../pages/vault.php?errordb=true');
+            exit;
+        }
+    }
+}
+
+
+//Mostrar audiovisuales
+function mostrarAudiovisuales($conexion, $id){
+        try{
+            $query="SELECT * FROM audiovisual WHERE idUsuario = :idUsuario ";
+            $statement= $conexion->prepare($query);
+            $statement->bindParam(':idUsuario', $id, PDO::PARAM_INT);
+            $statement->execute();
+            $audiovisuales = $statement->fetchAll(PDO::FETCH_ASSOC);
+            return $audiovisuales;
+        }catch(PDOException $e){
+            exit;
+        }
+}
+
+//Eliminar audiovisual
+if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['eliminaraudiovisual'])) {
+    $idAudiovisual = $_POST['idAudiovisual'];
+    $idUsuario = $_POST['idUsuario'];
+
+    eliminarAudiovisual($conexion, $idAudiovisual, $idUsuario);
+}
+
+function eliminarAudiovisual($conexion, $idAudiovisual, $idUsuario){
+    try{
+        $query = "DELETE FROM audiovisual WHERE id = :idAudiovisual AND idUsuario = :idUsuario";
+        $statement= $conexion->prepare($query);
+        $statement->bindParam(':idAudiovisual', $idAudiovisual, PDO::PARAM_INT);
+        $statement->bindParam(':idUsuario', $idUsuario, PDO::PARAM_INT);
+        $statement->execute();
+        header('Location ../pages/vault.php');
+    }catch(PDOException $e){
+        exit;
+    }
+}
+
+
+//Modificar audiovisual
+if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['modificaraudiovisual'])) {
+        $idAudiovisual= $_POST['idAudiovisual'];
+        $idUsuario= $_POST['idUsuario'];
+        $tipo= $_POST['tipo'];
+        $nombre = mb_strtoupper(trim($_POST['nombre']));
+        $descripcion = trim($_POST['descripcion']);
+        $estado= $_POST['estado'];
+    
+
+    modificarAudiovisual($conexion, $idAudiovisual,  $tipo, $nombre, $descripcion,$estado);
+}
+
+function modificarAudiovisual($conexion, $idAudiovisual,  $tipo, $nombre, $descripcion, $estado)
+{
+    if (empty($tipo) || empty($nombre) || empty($descripcion) || empty($estado)) {
+        header("Location: vault.php?audiovisualvacio=true");
+        exit;
+    }
+
+    if (!in_array($tipo, ['pelicula', 'serie']) || !in_array($estado, ['vista', 'viendo', 'pendiente'])) {
+        header("Location: vault.php?audiovisualvacio=false");
+        exit;
+    } else {
+        try {
+            $query = "UPDATE audiovisual SET tipo = :tipo, nombre = :nombre, descripcion = :descripcion, estado = :estado WHERE id = :idAudiovisual AND idUsuario = :idUsuario";
+            $statement = $conexion->prepare($query);
+            $statement->bindParam(':idUsuario', $_SESSION['id'], PDO::PARAM_INT); 
+            $statement->bindParam(':idAudiovisual', $idAudiovisual, PDO::PARAM_INT);
+            $statement->bindParam(':tipo', $tipo, PDO::PARAM_STR);
+            $statement->bindParam(':nombre', $nombre, PDO::PARAM_STR);
+            $statement->bindParam(':descripcion', $descripcion, PDO::PARAM_STR);
+            $statement->bindParam(':estado', $estado, PDO::PARAM_STR);
+            $statement->execute();
+            header('Location: ../pages/vault.php'); 
+            exit;
+        } catch (PDOException $e) {
+            header('Location: ../pages/vault.php?errordb=true');
+            exit;
+        }
+    }
+}
+
 

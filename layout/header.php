@@ -67,8 +67,8 @@
 
 <body>
     <?php
-    include '../bd/bd.php';
     session_start();
+    include '../bd/bd.php';
 
     ?>
 
