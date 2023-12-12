@@ -40,3 +40,18 @@ mostrando el nombre de la persiona que ha iniciado sesión sustituyendo "invitad
 Se irá actualizando el readme con todas novedades del proyecto.
 
 ## Este proyecto se ha creado el mismo día que ha creado el profesor el comunicado: 05/12/2023
+
+
+
+
+
+
+
+ACTUALIZACIÓN 12/12/2023
+
+Por problemas de las rutas absolutas del comportamiento de la web se ha tenido que sacar la carpeta de páginas para poder hacer el proyecto efectivo para hacer deploy en un servidor real de hosteo.
+
+
+Se ha añadido el filtro de los audiovisuales y la cookie para cambiar los estilos.
+
+Faltaría crear la página para mostrar usuarios y la web de documentación para explicar el funcionamiento de lamisma y el procedimiento más detallado.

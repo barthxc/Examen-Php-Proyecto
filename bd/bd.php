@@ -3,6 +3,13 @@
     De esta forma tengo toda la lógica principal con la base de datos en este archivo y tengo un mejor control en funciones
     También de esta forma para manejar la sesión y persistencia lo único que debo añadir en los demás archivos y páginas solo sería
     la sesión, esto me genera mucha limpieza de código.
+
+
+    host:localhost
+    000webhost db
+    dbname = id21634655_proyectoexamen
+    nombreusuario = id21634655_root
+    password = Solpablowatchvault123!
 */
 $host = 'localhost:3308'; // Puede ser 'localhost' si la base de datos está en el mismo servidor || 127.0.0.1:3308
 $dbname = 'proyectoexamen';
@@ -13,6 +20,17 @@ $password = '';
 $modal = false;
 $modalaudiovisual=false;
 $modalaudiovisualmodificar=false;
+
+// Necesito setear los datos seleccionados desde el principio para que el formulario no de error y así poder esa variables en la página vault.php
+$tipoFiltro = isset($_POST['tipofiltro']) ? $_POST['tipofiltro'] : null;
+$estadofiltro = isset($_POST['estadofiltro']) ? $_POST['estadofiltro'] : null;
+
+
+//Establezco la cookie con valor pablo si no existe
+if (!isset($_COOKIE['estilo'])) {
+    setcookie('estilo', 'pablo');
+}
+
 
 
 //Conexión a la base de datos
@@ -42,7 +60,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['openmodalaudiovisual']
 }
 //CerrarModal Audiovisual
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['closemodalaudiovisual'])) {
-    header('Location: ../pages/vault.php?audiovisualvacio=false');
+    header('Location: vault.php?audiovisualvacio=false');
     exit;
 }
 
@@ -79,7 +97,7 @@ function registrarUsuario($conexion, $nombre, $email, $password)
     $password = trim($password);
 
     if (empty($nombre) || empty($email) || empty($password)) {
-        header('Location: ../pages/registro.php?errorformregistro=true');
+        header('Location: registro.php?errorformregistro=true');
         exit;
     } else {
         try {
@@ -110,7 +128,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['login'])) {
 function loginUsuario($conexion, $email, $password)
 {
     if (empty($email) || empty($password)) {
-        header('Location: ../pages/index.php?errorform=true');
+        header('Location: ../index.php?errorform=true');
         exit;
     } else {
         try {
@@ -127,15 +145,15 @@ function loginUsuario($conexion, $email, $password)
                 $_SESSION['usuario'] = $usuario['nombre'];
                 $_SESSION['id'] = $usuario['id'];
 
-                header('Location: ../pages/index.php?success=true');
+                header('Location: ../index.php?success=true');
                 exit;
             } else {
                 // Credenciales inválidas, mostrar mensaje de error
-                header('Location: ../pages/index.php?errorcred=true');
+                header('Location: ../index.php?errorcred=true');
                 exit;
             }
         } catch (PDOException $e) {
-            header('Location: ../pages/index.php?errordb=true');
+            header('Location: ../index.php?errordb=true');
             exit;
         }
     }
@@ -149,7 +167,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['logout'])) {
     session_start();
     session_destroy();
 
-    header('Location: ../pages/index.php');
+    header('Location: ../index.php');
     exit;  
 }
 
@@ -185,9 +203,9 @@ function agregarAudiovisual($conexion, $tipo,$nombre,$descripcion,$estado){
             $statement->bindParam(':descripcion', $descripcion, PDO::PARAM_STR);
             $statement->bindParam(':estado', $estado, PDO::PARAM_STR);
             $statement->execute();
-            header('Location ../pages/vault.php');
+            header('Location vault.php');
         } catch (PDOException $e) {
-            header('Location: ../pages/vault.php?errordb=true');
+            header('Location: vault.php?errordb=true');
             exit;
         }
     }
@@ -195,11 +213,11 @@ function agregarAudiovisual($conexion, $tipo,$nombre,$descripcion,$estado){
 
 
 //Mostrar audiovisuales
-function mostrarAudiovisuales($conexion, $id){
+function mostrarAudiovisuales($conexion){
         try{
             $query="SELECT * FROM audiovisual WHERE idUsuario = :idUsuario ";
             $statement= $conexion->prepare($query);
-            $statement->bindParam(':idUsuario', $id, PDO::PARAM_INT);
+            $statement->bindParam(':idUsuario', $_SESSION['id'], PDO::PARAM_INT);
             $statement->execute();
             $audiovisuales = $statement->fetchAll(PDO::FETCH_ASSOC);
             return $audiovisuales;
@@ -264,13 +282,70 @@ function modificarAudiovisual($conexion, $idAudiovisual,  $tipo, $nombre, $descr
             $statement->bindParam(':descripcion', $descripcion, PDO::PARAM_STR);
             $statement->bindParam(':estado', $estado, PDO::PARAM_STR);
             $statement->execute();
-            header('Location: ../pages/vault.php'); 
+            header('Location: vault.php'); 
             exit;
         } catch (PDOException $e) {
-            header('Location: ../pages/vault.php?errordb=true');
+            header('Location: vault.php?errordb=true');
             exit;
         }
     }
 }
 
 
+
+
+// Cambiar estilo
+if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['cambiarsestilo'])) {
+    $nuevoEstilo = ($_COOKIE['estilo'] == 'pablo') ? 'sol' : 'pablo';
+    setcookie('estilo', $nuevoEstilo, time() + 5000);
+}
+
+
+
+
+//Búsqueda de filtro
+if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['busquedafiltro'])) {
+    $tipoFiltro = !empty($_POST['tipofiltro']) ? $_POST['tipofiltro'] : null;
+    $estadofiltro = !empty($_POST['estadofiltro']) ? $_POST['estadofiltro'] : null;
+    busquedaFiltro($conexion, $tipoFiltro, $estadofiltro);
+}
+
+function busquedaFiltro($conexion, $tipoFiltro, $estadoFiltro)
+{
+    try {
+        $query = "SELECT * FROM audiovisual WHERE idUsuario = :idUsuario";
+        
+        if ($tipoFiltro == 'pelicula' || $tipoFiltro == 'serie') {
+            $query .= " AND tipo = :tipo";
+        }
+
+        if ($estadoFiltro == 'vista' || $estadoFiltro == 'pendiente' || $estadoFiltro == 'viendo') {
+            $query .= " AND estado = :estado";
+        }
+
+        $statement = $conexion->prepare($query);
+        $statement->bindParam(':idUsuario', $_SESSION['id'], PDO::PARAM_INT);
+
+        if ($tipoFiltro == 'pelicula' || $tipoFiltro == 'serie') {
+            $statement->bindParam(':tipo', $tipoFiltro, PDO::PARAM_STR);
+        }
+
+        if ($estadoFiltro == 'vista' || $estadoFiltro == 'pendiente' || $estadoFiltro == 'viendo') {
+            $statement->bindParam(':estado', $estadoFiltro, PDO::PARAM_STR);
+        }
+
+        $statement->execute();
+        $filtro = $statement->fetchAll(PDO::FETCH_ASSOC);
+        return $filtro;
+    } catch (PDOException $e) {
+        header('Location: index.php?errordb=true');
+    }
+}
+
+
+if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['resetfiltro'])) {
+    $tipoFiltro = null;
+    $estadofiltro = null;
+    header('Location: vault.php');
+    exit();  // Asegúrate de salir después de la redirección
+}

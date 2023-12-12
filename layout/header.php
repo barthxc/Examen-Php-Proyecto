@@ -7,77 +7,32 @@
     <title>WatchVault</title>
     <!-- <script src="https://cdn.tailwindcss.com"></script> -->
     <link href="https://unpkg.com/tailwindcss@^2/dist/tailwind.min.css" rel="stylesheet" />
-    <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="/layout/styles.css" />
     <!-- Tengo que añadir los estilos de forma internar porque por algún motivo si ejecuto 
     alguna página donde tengo incluido mis layouts da un error de estilos.
     Así que me veo obligado a introducir los diseños en la etiqueta directamente en el header -->
-    <style>
-        body {
-            background-color: #111827;
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;
-            margin: 0 2rem 0 2rem;
-        }
-
-        .table {
-            border-spacing: 0 15px;
-        }
-
-        i {
-            font-size: 1rem !important;
-        }
-
-        .table tr {
-            border-radius: 20px;
-        }
-
-        h1 {
-            color: #e1dfd1;
-            font-size: 50px;
-        }
-
-        tr td:nth-child(n + 5),
-        tr th:nth-child(n + 5) {
-            border-radius: 0 0.625rem 0.625rem 0;
-        }
-
-        tr td:nth-child(1),
-        tr th:nth-child(1) {
-            border-radius: 0.625rem 0 0 0.625rem;
-        }
-
-        /**HOVER DE SVG's**/
-        .crear {
-            background-color: #1f2937;
-        }
-
-        .crear svg {
-            transition: fill 0.3s ease;
-            /* Agrega una transición suave al cambio de color */
-        }
-
-        /* Cambia el color del path al hacer hover sobre el SVG */
-        .crear svg:hover path {
-            fill: #16a34a;
-            /* Cambia este valor al color que desees */
-        }
-    </style>
 </head>
 
-<body>
+<body class="<?= ($_COOKIE['estilo'] == 'sol') ? 'sol' : '' ?>">
     <?php
     session_start();
-    include '../bd/bd.php';
-
+    include 'bd/bd.php';
     ?>
-
+    <div class="flex flex-row justify-end items-center mt-5 mr-10">
+        <div>
+            <form action="" method="POST">
+                <button type="submit" name="cambiarsestilo" title="<?= ($_COOKIE['estilo'] == 'sol') ? 'Modo Pablo' : 'Modo Sol' ?>">
+                    <?= ($_COOKIE['estilo'] == 'sol') ? '<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 256 256"><path fill="#1f2937" d="M240 96a8 8 0 0 1-8 8h-16v16a8 8 0 0 1-16 0v-16h-16a8 8 0 0 1 0-16h16V72a8 8 0 0 1 16 0v16h16a8 8 0 0 1 8 8Zm-96-40h8v8a8 8 0 0 0 16 0v-8h8a8 8 0 0 0 0-16h-8v-8a8 8 0 0 0-16 0v8h-8a8 8 0 0 0 0 16Zm65.14 94.33A88.07 88.07 0 0 1 105.67 46.86a8 8 0 0 0-10.6-9.06A96 96 0 1 0 218.2 160.93a8 8 0 0 0-9.06-10.6Z"/></svg>' : '<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24"><path fill="#561a45" d="M11 5V1h2v4h-2Zm6.65 2.75l-1.375-1.375l2.8-2.875l1.4 1.425L17.65 7.75ZM19 13v-2h4v2h-4Zm-8 10v-4h2v4h-2ZM6.35 7.7L3.5 4.925l1.425-1.4L7.75 6.35L6.35 7.7Zm12.7 12.8l-2.775-2.875l1.35-1.35l2.85 2.75L19.05 20.5ZM1 13v-2h4v2H1Zm3.925 7.5l-1.4-1.425l2.8-2.8l.725.675l.725.7l-2.85 2.85ZM12 18q-2.5 0-4.25-1.75T6 12q0-2.5 1.75-4.25T12 6q2.5 0 4.25 1.75T18 12q0 2.5-1.75 4.25T12 18Z"/></svg>' ?>
+                </button>
+            </form>
+        </div>
+    </div>
 
     <div class="flex flex-col mb-10 justify-evenly text-gray-400 items-center sm:flex-row">
         <div class="flex flex-row gap-10 py-10 justify-center font-bold text-4xl">
-            <a href="../pages/index.php" class="hover:text-gray-300">Inicio</a>
-            <a href="../pages/vault.php" class="hover:text-gray-300 <?php echo isset($_SESSION['usuario']) ? 'text-green-400 hover:text-green-200' : ''; ?>">Vault</a>
-            <a href="../pages/doc.php" class="hover:text-gray-300">Doc</a>
+            <a href="/index.php" class="hover:text-gray-300">Inicio</a>
+            <a href="/vault.php" class="hover:text-gray-300 <?php echo isset($_SESSION['usuario']) ? 'text-green-400 hover:text-green-200' : ''; ?>">Vault</a>
+            <a href="/doc.php" class="hover:text-gray-300">Doc</a>
         </div>
 
         <div class="flex flex-col gap-2 text-base">
@@ -139,7 +94,7 @@
             ";
 
         echo "
-            <form action='index.php' method='POST'>
+            <form action='' method='POST'>
             <div class='flex flex-col justify-center gap-1'>
             <label for='' class='text-gray-300 font-bold'>Email</label>
             <input type='mail' name='email' class='mb-2 bg-gray-400 text-gray-800'>

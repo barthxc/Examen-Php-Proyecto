@@ -1,3 +1,7 @@
+
+
+
+
 body {
   background-color: #111827;
   display: flex;
@@ -5,6 +9,16 @@ body {
   min-height: 100vh;
   margin: 0 2rem 0 2rem;
 }
+
+/*estilos para el modo Sol*/
+body.sol{
+  background-color: #180726;
+}
+tr.sol{
+  background-color: #561a45;
+}
+
+
 
 .table {
   border-spacing: 0 15px;

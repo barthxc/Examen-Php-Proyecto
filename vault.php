@@ -1,17 +1,15 @@
 <?php
-include '../layout/header.php';
+include 'layout/header.php';
 
 //El usuario debe iniciar sesión para poder acceder a la página vault.php
 if (!isset($_SESSION['usuario'])) {
-    header('Location: index.php');
+    header('Location: /index.php');
 }
 
 if (isset($_GET['audiovisualvacio']) && $_GET['audiovisualvacio'] === 'true') {
     $modalaudiovisual = true;
     echo "<p class='text-red-500 font-bold text-center text-base'>Campos vacios</p>";
 }
-
-
 
 ?>
 
@@ -32,18 +30,51 @@ if (isset($_GET['audiovisualvacio']) && $_GET['audiovisualvacio'] === 'true') {
     </div>
 
     <div class="overflow-auto lg:overflow-visible">
+
+        <!--Filtros-->
+        <div class="flex flex-row gap-5 justify-start items-center mx-10">
+            <form action="" method="POST" class="flex flex-row gap-2 justify-around">
+                <select name="tipofiltro" class="px-1 rounded font-bold text-white bg-gray-800">
+                    <option value="" <?php echo ($tipoFiltro === null) ? 'selected' : ''; ?> disabled>-Tipo-</option>
+                    <option value="serie" <?php echo ($tipoFiltro === 'serie') ? 'selected' : ''; ?>>Serie</option>
+                    <option value="pelicula" <?php echo ($tipoFiltro === 'pelicula') ? 'selected' : ''; ?>>Pelicula</option>
+                </select>
+
+                <select name="estadofiltro" class="px-1 rounded font-bold text-white bg-gray-800">
+                    <option value="" <?php echo ($estadofiltro === null) ? 'selected' : ''; ?> disabled>-Estado-</option>
+                    <option value="vista" <?php echo ($estadofiltro === 'vista') ? 'selected' : ''; ?> class="hover:bg-red-400">Vista</option>
+                    <option value="viendo" <?php echo ($estadofiltro === 'viendo') ? 'selected' : ''; ?> class="hover:bg-red-400">Viendo</option>
+                    <option value="pendiente" <?php echo ($estadofiltro === 'pendiente') ? 'selected' : ''; ?> class="hover:bg-red-400">Pendiente</option>
+                </select>
+                <button type="submit" name="busquedafiltro"><svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 256 256">
+                        <path fill="#9ca3af" d="M168 112a56 56 0 1 1-56-56a56 56 0 0 1 56 56Zm61.66 117.66a8 8 0 0 1-11.32 0l-50.06-50.07a88 88 0 1 1 11.32-11.31l50.06 50.06a8 8 0 0 1 0 11.32ZM112 184a72 72 0 1 0-72-72a72.08 72.08 0 0 0 72 72Z" />
+                    </svg></button>
+                <button type="submit" name="resetfiltro"><svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 32 32">
+                        <path fill="#9ca3af" d="M18 28A12 12 0 1 0 6 16v6.2l-3.6-3.6L1 20l6 6l6-6l-1.4-1.4L8 22.2V16a10 10 0 1 1 10 10Z" />
+                    </svg></button>
+            </form>
+        </div>
+
+
+
         <table class="table text-gray-400 border-separate space-y-6 text-sm">
             <tbody>
 
 
                 <?php
-                $audiovisuales = mostrarAudiovisuales($conexion, $_SESSION['id']);
+
+                if ($tipoFiltro !== null || $estadofiltro !== null) {
+                    $audiovisuales = busquedaFiltro($conexion, $tipoFiltro, $estadofiltro);
+                } else {
+                    $audiovisuales = mostrarAudiovisuales($conexion);
+                }
+
                 if (empty($audiovisuales)) {
-                    echo "<p class='text-green-400'>Agrega una pelicula o una serie!</p>";
+                    echo "<p class='text-red-400'>No hay ninguna pelicula o serie</p>";
                 } else {
                     foreach ($audiovisuales as $audiovisual) {
                         echo '
-                        <tr class="bg-gray-800">
+                        <tr class="bg-gray-800 ' . (($_COOKIE['estilo'] == 'sol') ? 'sol' : '') . '">
                             <td class="p-3">
                                 <div class="flex align-items-center" title="' . ($audiovisual['tipo'] == 'pelicula' ? 'Pelicula' : 'Serie') . '">
                                     <svg
@@ -243,4 +274,4 @@ if ($modalaudiovisual) {
 
 
 
-<?php include '../layout/footer.php' ?>
+<?php include 'layout/footer.php' ?>

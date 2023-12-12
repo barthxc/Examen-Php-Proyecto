@@ -1,9 +1,10 @@
-<?php include '../layout/header.php' ?>
+<?php
+include 'layout/header.php' ?>
 
 <?php
 if (isset($_GET['errorform']) && $_GET['errorform'] === 'true') {
-    $modal=true;
-    $error=true;
+    $modal = true;
+    $error = true;
 }
 ?>
 
@@ -13,4 +14,4 @@ if (isset($_GET['errorform']) && $_GET['errorform'] === 'true') {
 </section>
 
 
-<?php include '../layout/footer.php' ?>
+<?php include 'layout/footer.php' ?>
