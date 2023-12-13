@@ -55,3 +55,8 @@ Por problemas de las rutas absolutas del comportamiento de la web se ha tenido q
 Se ha añadido el filtro de los audiovisuales y la cookie para cambiar los estilos.
 
 Faltaría crear la página para mostrar usuarios y la web de documentación para explicar el funcionamiento de lamisma y el procedimiento más detallado.
+
+
+ACTUALIZACIÓN 13/12/2023
+
+añadir comentarios por usuario , haciendo fetchin de comentario por usuario por sesión pra mostrarlo

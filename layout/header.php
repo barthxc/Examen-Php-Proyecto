@@ -47,7 +47,6 @@
                     echo "<button class='hover:text-gray-300' name='openloginmodal'>Login</button>";
                 }
                 ?>
-
             </form>
         </div>
     </div>
