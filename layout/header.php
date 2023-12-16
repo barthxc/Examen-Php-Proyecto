@@ -28,11 +28,11 @@
         </div>
     </div>
 
-    <div class="flex flex-col mb-10 justify-evenly text-gray-400 items-center sm:flex-row">
+    <div class="flex flex-col mb-5 justify-evenly text-gray-400 items-center sm:flex-row">
         <div class="flex flex-row gap-10 py-10 justify-center font-bold text-4xl">
             <a href="/index.php" class="hover:text-gray-300">Inicio</a>
             <a href="/vault.php" class="hover:text-gray-300 <?php echo isset($_SESSION['usuario']) ? 'text-green-400 hover:text-green-200' : ''; ?>">Vault</a>
-            <a href="/doc.php" class="hover:text-gray-300">Doc</a>
+            <a href="/feed.php" class="hover:text-gray-300">Feed</a>
         </div>
 
         <div class="flex flex-col gap-2 text-base">
@@ -63,7 +63,6 @@
     }
 
     if (isset($_GET['errordb']) && $_GET['errordb'] === 'true') {
-        $modal = true;
         echo "<p class='text-red-500 font-bold text-center text-base'>Error insperado, intentalo más tarde</p>";
     }
 

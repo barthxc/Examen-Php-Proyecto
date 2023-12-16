@@ -11,6 +11,8 @@ if (isset($_GET['audiovisualvacio']) && $_GET['audiovisualvacio'] === 'true') {
     echo "<p class='text-red-500 font-bold text-center text-base'>Campos vacios</p>";
 }
 
+
+
 ?>
 
 

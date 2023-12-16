@@ -4,36 +4,49 @@
     También de esta forma para manejar la sesión y persistencia lo único que debo añadir en los demás archivos y páginas solo sería
     la sesión, esto me genera mucha limpieza de código.
 
-
+    INFORMACIÓN DEL SERVIDOR DEL HOST:
     host:localhost
     000webhost db
     dbname = id21634655_proyectoexamen
     nombreusuario = id21634655_root
     password = Solpablowatchvault123!
 */
-$host = 'localhost:3308'; // Puede ser 'localhost' si la base de datos está en el mismo servidor || 127.0.0.1:3308
+//Información de mi DSN
+$host = 'localhost:3308'; 
 $dbname = 'proyectoexamen';
 $username = 'root';
 $password = '';
 
-//Variables para controlar
+/*
+Variables en relación a a los modales. Si alguna variable está en true podré mostrar 
+los modales que son los formularios de inyección de datos
+*/
 $modal = false;
 $modalaudiovisual=false;
 $modalaudiovisualmodificar=false;
 
-// Necesito setear los datos seleccionados desde el principio para que el formulario no de error y así poder esa variables en la página vault.php
+/* Necesito setear los datos seleccionados desde el principio para que 
+el formulario no de error y así poder esa variables en la página vault.php
+Estos datos son los futuros filtros que utilizaré para buscar en el formulario principal las series y las peliculas
+*/
 $tipoFiltro = isset($_POST['tipofiltro']) ? $_POST['tipofiltro'] : null;
 $estadofiltro = isset($_POST['estadofiltro']) ? $_POST['estadofiltro'] : null;
 
 
-//Establezco la cookie con valor pablo si no existe
+/*
+He utilizado una cookie con el nombre 'Pablo' o 'Sol' para poder cambiar los estilos de toda la web
+Quiero que por defecto la web tenga los estilos por defecto así que uso por defecto el estilo pablo
+Si cambiase los estilos a 'sol' ya hay definido unas clases con el nombre SOL y una serie de reglas para cambiar los estilos.
+También tengo un botón que controla el estado de al cookie
+*/
 if (!isset($_COOKIE['estilo'])) {
     setcookie('estilo', 'pablo');
 }
 
 
 
-//Conexión a la base de datos
+/*Conexión a la base de datos
+*/
 try {
     $conexion = new PDO("mysql:host=$host;dbname=$dbname", $username, $password);
     $conexion->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
@@ -44,7 +57,11 @@ try {
 }
 
 
-//AbrirModal LOGIN
+/*
+Mi modus operandi es:
+Primero intento tener todos los 'escuchadores de peticiones POST y empiezo a elegir que hacer con ellos.
+Estos son manejadores de peticiones POST para mostrar modales y cerrarlos
+*/
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['openloginmodal'])) {
     $modal = true;
 }
@@ -64,6 +81,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['closemodalaudiovisual'
     exit;
 }
 
+/*Esta petición POST no alberga ningún tipo de función es solo para mostrar el modar cuando selección el botón modificar
+La gran diferencia de mostrar el modal para agregar es que agarro los datos guardados y los pongo en el formulario
+De esta forma el usuario sabe bien que está modificando y es mucho mas intuitivo 
+*/
+
+
 //AbrirModalModificar Audiovisual
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['openmodalmodificar'])) {
     $idAudiovisual= $_POST['idAudiovisual'];
@@ -76,9 +99,22 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['openmodalmodificar']))
 
 
 
+/* Aquí sigo el mismo modus operandi 
+La única diferencia es que utilizo una estructura de:
+Recojo el nombre de la petición POST y sus datos. Más tarde llamo a la función necesaria y escribo la función justo abajo.
+A partir de ahora todos el código cuando entra en una función manejará envíos a las páginas correspondientes con una variable que recojo
+para mostrar mensajes de error cuando ocurran diversas cosas. He decidido crear validaciones sencillas en todos los formularios.
+un ejemplo es:
+        header('Location: registro.php?errorformregistro=true');
+Muevo al usuario a la página registro con errorformregistro en TRUE cuando hay un error en el formulario
 
 
-
+He manejado la sesión de usuario de 2 formas distintas:
+    1- La he recogido en un input invisible en front y la intercepto en la respuesta del POST 
+    2- También la he usado en los bindparams sin necesidad de recogerla. Usé al principio el primero método siguiendo la lógica.
+    Más tarde lo cambié para experimentar y me gusta mucho mas ya que puedo crear funciones con muy pocos parámetros ya que
+    el servidor controla el dato de la sesión
+*/
 
 //Registro Usuario
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['registrousuario'])) {
@@ -91,7 +127,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['registrousuario'])) {
 
 function registrarUsuario($conexion, $nombre, $email, $password)
 {
-    //Elimino los espacios innecesarios
+    //Elimino los espacios innecesarios por si el usuario crea demasiados
     $nombre = trim($nombre);
     $email = trim($email);
     $password = trim($password);
@@ -113,9 +149,6 @@ function registrarUsuario($conexion, $nombre, $email, $password)
         }
     }
 }
-
-
-
 
 
 //Login Usuario
@@ -166,7 +199,6 @@ function loginUsuario($conexion, $email, $password)
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['logout'])) {
     session_start();
     session_destroy();
-
     header('Location: ../index.php');
     exit;  
 }
@@ -175,12 +207,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['logout'])) {
 
 //Registro Audiovisual
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['agregaraudiovisual'])) {
-
     $tipo = $_POST['tipo'];
     $nombre = mb_strtoupper(trim($_POST['nombre']));
     $descripcion = trim($_POST['descripcion']);
     $estado = $_POST['estado'];
-
     agregarAudiovisual($conexion, $tipo,$nombre,$descripcion,$estado);
 }
 
@@ -300,16 +330,28 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['cambiarsestilo'])) {
     setcookie('estilo', $nuevoEstilo, time() + 5000);
 }
 
-
-
-
 //Búsqueda de filtro
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['busquedafiltro'])) {
     $tipoFiltro = !empty($_POST['tipofiltro']) ? $_POST['tipofiltro'] : null;
     $estadofiltro = !empty($_POST['estadofiltro']) ? $_POST['estadofiltro'] : null;
     busquedaFiltro($conexion, $tipoFiltro, $estadofiltro);
 }
+/* Esta es la función mas especial y dificil con diferencia a todas. Estoy MUY contento de encontrar la información sobre esta función
+    Esta función tiene de peculiar que maneja 2 FILTROS totalmente distintos de una misma tabla al mismo tiempo
 
+    - Al principio el proyecto era mucho más simple y pequeño por lo tanto usé un truco en SQL el cual escribía:
+        SELECT * FROM tabla WHERE 1 . Justo apartir de esta query yo podría agregar muchas mas condiciones añadiendo 
+        trozos y segmentos de código a la query que empiezen por un AND ya que WHERE 1 es positivo.
+        De esta forma puedo tener varias condiciones y agregarlas o no dependiendo de los datos del filtro y podría tener varios:
+            AND table.algo = valor
+            AND table.algo = valor
+        Hice exactamente el mismo diseño de query pero agregando una condición que debe ser true de forma obligatoria y es:
+            que el usuario coincida con le sesión ya que solo el úsuario tiene acceso a SUS DATOS.
+        Me he visto obligado a hacerlo de esta forma como buena práctica aunque dentro de mi página vault.php pregunto de nuevo si existe
+        una sesión con un nombre. Si existe la sesión podré ejecutar el código que hay dentro que corresponde tanto a mostrar sus audiovisuales
+        como poder filtrar.
+        En cuyo caso esa condición sea negativa, Redirige automáticamente al Inicio. Haciendo que el usuario registrado no pueda ver contenido alguno del vault.php
+*/
 function busquedaFiltro($conexion, $tipoFiltro, $estadoFiltro)
 {
     try {
@@ -347,5 +389,63 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['resetfiltro'])) {
     $tipoFiltro = null;
     $estadofiltro = null;
     header('Location: vault.php');
-    exit();  // Asegúrate de salir después de la redirección
+    exit();
+}
+
+//Añadir comentario
+if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['crearcomentario'])) {
+    $mensaje= trim($_POST['mensaje']);
+    crearComentario($conexion,$mensaje);
+}
+
+function crearComentario($conexion,$mensaje){
+
+    if(!isset($_SESSION['id'])){
+        header("Location: feed.php?noregistrado=true");
+        exit;
+    }
+
+    if (empty($mensaje)) {
+        header("Location: feed.php?mensajevacio=true");
+        exit;
+    }else{
+        try {
+            $query = "INSERT INTO mensajes (idUsuario, mensaje) VALUES (:idUsuario, :mensaje)";
+            $statement = $conexion->prepare($query);
+            $statement->bindParam(':idUsuario', $_SESSION['id'], PDO::PARAM_INT);
+            $statement->bindParam(':mensaje', $mensaje, PDO::PARAM_STR);
+            $statement->execute();
+            header('Location: feed.php');
+        } catch (PDOException $e) {
+            header('Location: feed.php?errordb=true');
+            exit;
+        }
+    }
+}
+
+//Mostrar mensaje
+function mostrarMensajes($conexion) {
+    try {
+        $query = "SELECT mensajes.idMensaje, mensajes.mensaje, usuarios.nombre AS nombreUsuario
+                  FROM mensajes
+                  JOIN usuarios ON mensajes.idUsuario = usuarios.id";
+        $statement = $conexion->prepare($query);
+        $statement->execute();
+        $mensajes = $statement->fetchAll(PDO::FETCH_ASSOC);
+        return $mensajes;
+    } catch (PDOException $e) {
+        exit;
+    }
+}
+
+function mostrarUsuarios($conexion){
+    try{
+        $query ="SELECT * FROM usuarios";
+        $statement = $conexion->prepare($query);
+        $statement->execute();
+        $usuarios = $statement->fetchAll(PDO::FETCH_ASSOC);
+        return $usuarios;
+    }catch(PDOException $e){
+        exit;
+    }
 }
