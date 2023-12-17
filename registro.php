@@ -1,4 +1,4 @@
-<?php include '../layout/header.php' ?>
+<?php include 'layout/header.php' ?>
 
 <?php
 if (isset($_GET['errorformregistro']) && $_GET['errorformregistro'] === 'true') {
@@ -27,4 +27,4 @@ if (isset($_GET['successregistro']) && $_GET['successregistro'] === 'true') {
             </form>
         </div>
 
-<?php include '../layout/footer.php' ?>
+<?php include 'layout/footer.php' ?>

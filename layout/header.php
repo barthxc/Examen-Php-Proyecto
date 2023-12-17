@@ -105,7 +105,7 @@
             
             </div>
             </form>
-            <p class='text-center'>Crear una <a href='../pages/registro.php' class='text-gray-400 hover:text-gray-800'>aquí!</a></p>
+            <p class='text-center'>Crear una <a href='registro.php' class='text-gray-400 hover:text-gray-800'>aquí!</a></p>
         </div>
     ";
     }
