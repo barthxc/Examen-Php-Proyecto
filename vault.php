@@ -70,7 +70,8 @@ if (isset($_GET['audiovisualvacio']) && $_GET['audiovisualvacio'] === 'true') {
                 } else {
                     $audiovisuales = mostrarAudiovisuales($conexion);
                 }
-
+                /*como ya he comentado en la funcion mostrar audiovisuales pregunto si dicha función está vacia para mostrar un mensaje en cuyo caso no hubiera audiovisuales de ese usuario
+                 */
                 if (empty($audiovisuales)) {
                     echo "<p class='text-red-400'>No hay ninguna pelicula o serie</p>";
                 } else {
@@ -119,7 +120,6 @@ if (isset($_GET['audiovisualvacio']) && $_GET['audiovisualvacio'] === 'true') {
                                 <input type="hidden" name="nombre" value="' . htmlspecialchars($audiovisual['nombre']) . '">
                                 <input type="hidden" name="descripcion" value="' . htmlspecialchars($audiovisual['descripcion']) . '">
                                 <input type="hidden" name="estado" value="' . $audiovisual['estado'] . '">
-
                                     <svg
                                         xmlns="http://www.w3.org/2000/svg"
                                         width="30"
@@ -132,12 +132,9 @@ if (isset($_GET['audiovisualvacio']) && $_GET['audiovisualvacio'] === 'true') {
                                         />
                                     </svg>
                                 </button>
-
-
                                 <button type="submit" name="eliminaraudiovisual" class="text-base mr-2" title="Eliminar">
                                     <input type="hidden" name="idAudiovisual" value="' . $audiovisual['id'] . '">
                                     <input type="hidden" name="idUsuario" value="' . $_SESSION['id'] . '">
-
                                     <svg
                                         xmlns="http://www.w3.org/2000/svg"
                                         width="30"
@@ -155,19 +152,18 @@ if (isset($_GET['audiovisualvacio']) && $_GET['audiovisualvacio'] === 'true') {
                         </tr>';
                     }
                 }
-
-
                 ?>
             </tbody>
         </table>
     </div>
-
 </div>
 
 
 
 
 <?php
+
+/*Este es el Modal que se muestra si la variable es true y la cambio con una petición POST para mostra el audiovisual y del mismo modo la paso a false con otra llamada a post si le doy a cerrar que tiene un SVG en forma de X */
 if ($modalaudiovisual) {
     echo '
         <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-3/4 md:w-1/2 lg:w-1/3 xl:w-1/4 bg-gray-800 p-4 rounded-lg shadow-lg text-white">
@@ -217,6 +213,7 @@ if ($modalaudiovisual) {
                 </div>
             </form>
         </div>';
+        /* El mismo modo muestro el formulario para modificar es IGUAL pero al mismo tiempo distinto ya que en el value de los datos tiene los datos el propio elemento que he seleccionado */
 } else if ($modalaudiovisualmodificar) {
     echo '
     <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-3/4 md:w-1/2 lg:w-1/3 xl:w-1/4 bg-gray-800 p-4 rounded-lg shadow-lg text-white">
@@ -270,10 +267,5 @@ if ($modalaudiovisual) {
     </div>';
 }
 ?>
-
-
-
-
-
 
 <?php include 'layout/footer.php' ?>

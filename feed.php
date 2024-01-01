@@ -20,6 +20,7 @@ if (isset($_GET['mensajevacio']) && $_GET['mensajevacio'] === 'true') {
         <table class="table w-full text-gray-400 border-separate text-sm">
             <tbody>
                 <?php
+                /*Aquí ejecuto la función de mostrar todos los mensajes*/
                 $mensajes = mostrarMensajes($conexion);
                 if (empty($mensajes)) {
                     echo "<p class='text-green-400'>Serás el primero en añadir un comentario!</p>";

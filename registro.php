@@ -1,6 +1,7 @@
 <?php include 'layout/header.php' ?>
 
 <?php
+/* Estas peticiones get son lanzadas por las funciones de bd.php que ocurren cuando los campos son vacios o se crea la cuenta*/
 if (isset($_GET['errorformregistro']) && $_GET['errorformregistro'] === 'true') {
     echo "<p class='text-red-500 font-bold text-center text-base'>Campos vacios</p>";
 }

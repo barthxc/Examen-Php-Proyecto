@@ -45,8 +45,7 @@ if (!isset($_COOKIE['estilo'])) {
 
 
 
-/*Conexión a la base de datos
-*/
+/*Conexión a la base de datos*/
 try {
     $conexion = new PDO("mysql:host=$host;dbname=$dbname", $username, $password);
     $conexion->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
@@ -133,6 +132,8 @@ function registrarUsuario($conexion, $nombre, $email, $password)
     $password = trim($password);
 
     if (empty($nombre) || empty($email) || empty($password)) {
+        /*si hay un campo vacio enviamos al usuario a la página registro.php 
+        con el array asociativo GET lleno con ese dato para valorarlo y mostrar un mensaje*/
         header('Location: registro.php?errorformregistro=true');
         exit;
     } else {
@@ -157,6 +158,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['login'])) {
     $password = $_POST['password'];
     loginUsuario($conexion, $email, $password);
 }
+/*
+El login del usuario funciona de la siguiente forma. Para empezar verifico si están vacios. 
+Una vez esa condición entre en el else:
+    He decidido poner toda la programación en el else.
+    He decidido crear la condición normal y no añadir un ! simplente por estructurar bien la función y añadir el "largo de la funcion" al final
+    Estoy creando una query que es un select from de los datos exacto que ha puesto el usuario.
+    Si existe el usuario con dicha contraseña, crearé la sesión del usuario así que lo que ocurre en el fetch es traerme el dato del usuario y su contraseña
+
+*/
 
 function loginUsuario($conexion, $email, $password)
 {
@@ -243,6 +253,11 @@ function agregarAudiovisual($conexion, $tipo,$nombre,$descripcion,$estado){
 
 
 //Mostrar audiovisuales
+/* 
+Esta función no depende de ninguna petición POST o GET es una función que ejecute cuando vault.php se ejecuta.
+De forma que mostrarAudiovisuales es propiamente un dato ya que retorna y puedo usarlo en un foreach.
+Cuando ejecuto la función también pregunto si está vacio para poder mostrar un mensaje de que el usuario no tiene audiovisuales y puede agregar mas
+*/
 function mostrarAudiovisuales($conexion){
         try{
             $query="SELECT * FROM audiovisual WHERE idUsuario = :idUsuario ";
@@ -260,7 +275,6 @@ function mostrarAudiovisuales($conexion){
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['eliminaraudiovisual'])) {
     $idAudiovisual = $_POST['idAudiovisual'];
     $idUsuario = $_POST['idUsuario'];
-
     eliminarAudiovisual($conexion, $idAudiovisual, $idUsuario);
 }
 
@@ -286,8 +300,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['modificaraudiovisual']
         $nombre = mb_strtoupper(trim($_POST['nombre']));
         $descripcion = trim($_POST['descripcion']);
         $estado= $_POST['estado'];
-    
-
     modificarAudiovisual($conexion, $idAudiovisual,  $tipo, $nombre, $descripcion,$estado);
 }
 
@@ -328,6 +340,7 @@ function modificarAudiovisual($conexion, $idAudiovisual,  $tipo, $nombre, $descr
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['cambiarsestilo'])) {
     $nuevoEstilo = ($_COOKIE['estilo'] == 'pablo') ? 'sol' : 'pablo';
     setcookie('estilo', $nuevoEstilo, time() + 5000);
+    header("Location: index.php");
 }
 
 //Búsqueda de filtro
@@ -424,6 +437,9 @@ function crearComentario($conexion,$mensaje){
 }
 
 //Mostrar mensaje
+/*Ambas funciones son llamadas en páginas distintas para obtener dicha información. Solo se ejecuta al cargar la págin que recuerda la función
+Para mas tarde recorrer el dato con un forEach
+*/
 function mostrarMensajes($conexion) {
     try {
         $query = "SELECT mensajes.idMensaje, mensajes.mensaje, usuarios.nombre AS nombreUsuario
@@ -438,6 +454,10 @@ function mostrarMensajes($conexion) {
     }
 }
 
+//Mostrar usuarios
+/*Ambas funciones son llamadas en páginas distintas para obtener dicha información. Solo se ejecuta al cargar la págin que recuerda la función
+Para mas tarde recorrer el dato con un forEach
+*/
 function mostrarUsuarios($conexion){
     try{
         $query ="SELECT * FROM usuarios";
